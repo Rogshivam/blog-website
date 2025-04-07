@@ -127,18 +127,16 @@ function isLoggedIn(req, res, next){
     
 }
 // function isLoggedIn(req, res, next) {
-//     const token = req.cookies.token;
+//     const token = req.cookies.token || req.headers['authorization']?.split(' ')[1];
 //     if (!token) {
-//         return res.redirect("/login");  // If no token, redirect to login
+//         return res.status(401).send('Access Denied: No Token Provided');
 //     }
-    
 //     try {
-//         let data = jwt.verify(token, "shhh");
-//         req.user = data;  // Attach decoded user data to the request object
-//         next();  // Continue to the next middleware or route handler
+//         const verified = jwt.verify(token, process.env.JWT_SECRET);
+//         req.user = verified;
+//         next();
 //     } catch (err) {
-//         console.error("JWT verification failed:", err);
-//         return res.redirect("/login");  // Redirect if JWT verification fails
+//         res.status(400).send('Invalid Token');
 //     }
 // }
 
