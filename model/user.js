@@ -1,8 +1,9 @@
 const mongoose = require('mongoose');
+const config = require('../config');
 
-const Post = require('./post'); // Import the post model
-
-mongoose.connect("mongodb://127.0.0.1:27017/miniproject");
+mongoose.connect(config.MONGODB_URI)
+    .then(() => console.log('Connected to MongoDB'))
+    .catch(err => console.error('MongoDB connection error:', err));
 
 const userSchema = mongoose.Schema({
     username: String,
