@@ -61,6 +61,26 @@
             margin-bottom: 20px;
         }
 
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-buttons a {
+            padding: 8px 15px;
+            border-radius: 4px;
+            text-decoration: none;
+            color: white;
+        }
+
+        .public-blog-btn {
+            background-color: var(--primary-color);
+        }
+
+        .logout-btn {
+            background-color: #f44336;
+        }
+
         .user-info {
             margin-bottom: 20px;
         }
@@ -123,15 +143,6 @@
         .post-actions a:hover {
             text-decoration: underline;
         }
-
-        .logout-link {
-            color: #f44336;
-            text-decoration: none;
-        }
-
-        .logout-link:hover {
-            text-decoration: underline;
-        }
     </style>
 </head>
 
@@ -140,7 +151,10 @@
         <button id="darkModeToggle" class="dark-mode-toggle">🌙</button>
         <div class="header">
             <h1>Welcome, <%= user.name %></h1>
-            <a href="/logout" class="logout-link">Logout</a>
+            <div class="nav-buttons">
+                <a href="/public-posts" class="public-blog-btn">Public Blog</a>
+                <a href="/logout" class="logout-btn">Logout</a>
+            </div>
         </div>
 
         <div class="user-info">
@@ -153,7 +167,7 @@
             <form action="/post" method="POST">
                 <textarea name="content" placeholder="What's on your mind?" required></textarea>
                 <button type="submit">Post</button>
-            </form>
+        </form>
         </div>
 
         <div class="posts">

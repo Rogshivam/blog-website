@@ -6,7 +6,7 @@ const postSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "user"
     },
-    data:{
+    createdAt:{
         type: Date,
         default: Date.now
     },
