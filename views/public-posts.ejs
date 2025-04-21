@@ -290,7 +290,7 @@
                                 type="text" 
                                 name="search" 
                                 class="search-input" 
-                                placeholder="Search by name..." 
+                                placeholder="Search by name or post content..." 
                                 value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>"
                             >
                             <button type="submit" class="search-button">Search</button>
@@ -312,7 +312,7 @@
                 <% posts.forEach(function(post) { %>
                     <div class="post">
                         <div class="post-header">
-                            <span class="post-author"><%= post.user.name %></span>
+                            <a href="/follow-page/<%= post.user._id %>" class="post-author" style="text-decoration: none; color: var(--primary-color);"><%= post.user.name %></a>
                             <div class="post-actions">
                                 <a href="/like/<%= post._id %>">Like</a>
                                 <% if (post.user._id.toString() === currentUser._id.toString()) { %>

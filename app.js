@@ -32,7 +32,16 @@ app.get('/public-posts', isLoggedIn, async (req, res) => {
                 name: { $regex: searchQuery, $options: 'i' } 
             });
             const userIds = users.map(user => user._id);
-            query = { user: { $in: userIds } };
+            
+            // Create a query that matches either:
+            // 1. Posts from users whose names match the search
+            // 2. Posts whose content contains the search words
+            query = {
+                $or: [
+                    { user: { $in: userIds } },
+                    { content: { $regex: searchQuery, $options: 'i' } }
+                ]
+            };
         }
 
         const posts = await postModel.find(query)
