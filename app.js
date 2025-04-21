@@ -129,7 +129,7 @@ async function init() {
 
         // Routes
         app.get('/', (req, res) => {
-            res.render("index");
+            res.render("login");
         });
 
         app.get("/test", (req, res) => {
