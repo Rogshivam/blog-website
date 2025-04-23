@@ -4,7 +4,7 @@ const Follow = require('../models/follow');
 const User = require('../models/user');
 const Post = require('../models/post');
 const userSchema = new Schema({
-    username: { type: String, required: true },
+    username: { type: String, required: true,unique: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     name: { type: String, required: true },
