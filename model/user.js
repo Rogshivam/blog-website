@@ -1,17 +1,27 @@
 const mongoose = require('mongoose');
-const config = require('../config');
+const { Schema } = mongoose;
 
-mongoose.connect(config.MONGODB_URI)
-    .then(() => console.log('Connected to MongoDB'))
-    .catch(err => console.error('MongoDB connection error:', err));
+// Define the User schema
+const userSchema = new Schema(
+    {
+        username: { type: String, required: true },
+        email: { type: String, required: true, unique: true },
+        password: { type: String, required: true },
+        name: { type: String, required: true },
+        age: { type: Number, required: true },
+        posts: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Post"  // The posts created by this user
+            }
+        ],
+        followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'user' }],
+        following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'user' }]
+    },
+    { timestamps: true }
+);
 
-const userSchema = mongoose.Schema({
-    username: String,
-    email: String,
-    password: String,
-    name: String,
-    age: Number,
-    posts: [{type: mongoose.Schema.Types.ObjectId, ref: "post"}]
-});
+// Create the User model from the schema
+const User = mongoose.model('User', userSchema);
 
-module.exports = mongoose.model('user', userSchema);
+module.exports = User;

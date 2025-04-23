@@ -24,6 +24,16 @@
             --post-bg: #4a5568;
             --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
         }
+        .dark-mode-toggle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+        }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -149,6 +159,7 @@
 </head>
 <body>
     <div class="container">
+        <button id="darkModeToggle" class="dark-mode-toggle">🌙</button>
         <div class="nav-buttons">
             <a href="/public-posts">Back to Public Posts</a>
             <a href="/profile">My Profile</a>
@@ -164,24 +175,33 @@
                         <span class="stat-label">Posts</span>
                     </div>
                     <div class="stat">
-                        <span class="stat-value"><%= user.followers.length %></span>
+                        <span class="stat-value"><%= user.followers ? user.followers.length : 0 %></span>
                         <span class="stat-label">Followers</span>
                     </div>
                     <div class="stat">
-                        <span class="stat-value"><%= user.following.length %></span>
+                        <span class="stat-value"><%= user.following ? user.following.length : 0 %></span>
                         <span class="stat-label">Following</span>
                     </div>
+                    
                 </div>
             </div>
-            <% if (currentUser._id.toString() !== user._id.toString()) { %>
-                <button 
-                    class="follow-button <%= isFollowing ? 'following' : '' %>" 
-                    onclick="toggleFollow('<%= user._id %>')"
-                >
-                    <%= isFollowing ? 'Following' : 'Follow' %>
-                </button>
-            <% } %>
+              
+                <% if (currentUser && currentUser._id.toString() !== user._id.toString()) { %>
+                    <div class="nav-buttons">
+                        <button 
+                            class="follow-button <%= isFollowing ? 'following' : '' %>" 
+                            onclick="toggleFollow('<%= user._id %>')"
+                        >
+                            <%= isFollowing ? 'Following' : 'Follow' %>
+                        </button>
+                    </div>
+                <% } %>
+            
+            
+            
+            
         </div>
+        
 
         <div class="posts">
             <% if (user.posts && user.posts.length > 0) { %>
@@ -203,30 +223,10 @@
         </div>
     </div>
 
-    <script>
-        async function toggleFollow(userId) {
-            try {
-                const response = await fetch(`/toggle-follow/${userId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    const button = document.querySelector('.follow-button');
-                    button.textContent = data.isFollowing ? 'Following' : 'Follow';
-                    button.classList.toggle('following', data.isFollowing);
-                    
-                    // Update follower count
-                    const followerCount = document.querySelector('.stat-value:nth-child(1)');
-                    followerCount.textContent = data.followerCount;
-                }
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        }
-    </script>
+    <script src="/js/darkmode.js"></script>
+    <script src="/js/follow-page.js"></script>
+
+
+
 </body>
 </html> 

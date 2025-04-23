@@ -11,6 +11,7 @@ const multer = require("multer");
 const config = require('./config');
 const mongoose = require('mongoose');
 
+
 // Basic Express setup
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views")); // Set the views directory
@@ -18,6 +19,77 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public'))); // Set the public directory
+
+//route to follow-page 
+app.get('/follow-page/:id', isLoggedIn, async (req, res) => {
+    try {
+        const profileUser = await userModel.findById(req.params.id).populate("posts");
+        const currentUser = await userModel.findById(req.user.userid);
+
+        if (!profileUser) {
+            return res.status(404).send("User not found");
+        }
+
+        // Ensure profileUser.followers exists as an array
+        const isFollowing = profileUser.followers && profileUser.followers.includes(currentUser._id);
+
+
+        res.render("follow-page", {
+            user: profileUser,
+            currentUser,
+            isFollowing
+        });
+    } catch (error) {
+        console.error("Error loading follow-page:", error);
+        res.status(500).send("Internal Server Error");
+    }
+});
+
+
+//toggle to follow-unfollow
+app.post('/toggle-follow/:id', isLoggedIn, async (req, res) => {
+    try {
+        const userToFollow = await userModel.findById(req.params.id);
+        const currentUser = await userModel.findById(req.user.userid);
+
+        if (!userToFollow || !currentUser) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        // Make sure followers and following arrays are initialized
+        if (!Array.isArray(userToFollow.followers)) {
+            userToFollow.followers = [];
+        }
+        if (!Array.isArray(currentUser.following)) {
+            currentUser.following = [];
+        }
+
+        const index = userToFollow.followers.indexOf(currentUser._id);
+        let isFollowing = false;
+
+        if (index === -1) {
+            userToFollow.followers.push(currentUser._id);
+            currentUser.following.push(userToFollow._id);
+            isFollowing = true;
+        } else {
+            userToFollow.followers.splice(index, 1);
+            currentUser.following.splice(currentUser.following.indexOf(userToFollow._id), 1);
+        }
+
+        await userToFollow.save();
+        await currentUser.save();
+
+        res.json({
+            isFollowing,
+            followerCount: userToFollow.followers.length
+        });
+    } catch (error) {
+        console.error("Follow toggle error:", error);
+        res.status(500).json({ error: "Something went wrong" });
+    }
+});
+
+
 
 // Public Posts Route - Moved outside init()
 app.get('/public-posts', isLoggedIn, async (req, res) => {

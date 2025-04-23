@@ -1,19 +1,27 @@
-// import mongoose from 'mongoose';
+
 const mongoose = require('mongoose');
+const { Schema } = mongoose;
 
-const postSchema = mongoose.Schema({ 
-    user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "user"
+// Define the Post schema
+const postSchema = new Schema(
+    {
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",  // The user who created the post
+            required: true
+        },
+        content: { type: String, required: true },
+        likes: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User"  // Users who liked the post
+            }
+        ]
     },
-    createdAt:{
-        type: Date,
-        default: Date.now
-    },
-    content: String,
-    likes:[
-        {type: mongoose.Schema.Types.ObjectId, ref: "user"}
-    ] 
-});
+    { timestamps: true }
+);
 
-module.exports = mongoose.model('post', postSchema);
+// Create the Post model from the schema
+const Post = mongoose.model('Post', postSchema);
+
+module.exports = Post;
