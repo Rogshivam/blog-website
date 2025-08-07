@@ -18,10 +18,11 @@ interface Post {
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  
+  const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
   const fetchPosts = (searchQuery = '') => {
     setLoading(true);
-    fetch(`http://localhost:5000/api/public-posts?search=${encodeURIComponent(searchQuery)}`, {
+    fetch(`${baseURL}/api/public-posts?search=${encodeURIComponent(searchQuery)}`, {
       credentials: 'include',
     })
       .then(res => res.json())

@@ -13,6 +13,7 @@ interface AuthState {
   isAuthenticated: boolean;
   loading: boolean;
 }
+const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export const useAuth = () => {
   const [authState, setAuthState] = useState<AuthState>({
@@ -24,7 +25,7 @@ export const useAuth = () => {
 
   const checkAuth = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/profile', {
+      const res = await fetch(`${baseURL}/api/profile`, {
         credentials: 'include',
       });
 
@@ -54,7 +55,7 @@ export const useAuth = () => {
 
   const login = async (email: string, password: string) => {
     try {
-      const res = await fetch('http://localhost:5000/api/login', {
+      const res = await fetch(`${baseURL}/api/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -83,7 +84,7 @@ export const useAuth = () => {
 
   const logout = async () => {
     try {
-      await fetch('http://localhost:5000/api/logout', {
+      await fetch(`${baseURL}/api/logout`, {
         method: 'POST',
         credentials: 'include',
       });
@@ -108,7 +109,7 @@ export const useAuth = () => {
     age: number;
   }) => {
     try {
-      const res = await fetch('http://localhost:5000/api/register', {
+      const res = await fetch(`${baseURL}/api/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

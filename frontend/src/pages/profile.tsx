@@ -28,7 +28,7 @@ const Profile: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const router = useRouter();
-  const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000';
+  const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL ;
   useEffect(() => {
     fetchProfile();
   }, []);
@@ -75,7 +75,7 @@ const Profile: React.FC = () => {
   //   }
 
   //   try {
-  //     const res = await fetch('http://localhost:5000/api/posts', {
+  //     const res = await fetch(`${baseURL}/api/posts`, {
   //       method: 'POST',
   //       headers: { 'Content-Type': 'application/json' },
   //       credentials: 'include',
@@ -156,7 +156,7 @@ const Profile: React.FC = () => {
     }
 
     try {
-      const res = await fetch(`http://localhost:5000/api/posts/${postId}`, {
+      const res = await fetch(`${baseURL}/api/posts/${postId}`, {
         method: 'DELETE',
         credentials: 'include',
       });

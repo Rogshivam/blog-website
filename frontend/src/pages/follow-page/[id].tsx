@@ -28,6 +28,7 @@ const FollowPage: React.FC = () => {
   const [error, setError] = useState('');
   const router = useRouter();
   const { id } = router.query;
+  const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   useEffect(() => {
     if (id) {
@@ -37,7 +38,7 @@ const FollowPage: React.FC = () => {
 
   const fetchUserProfile = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/users/${id}`, {
+      const res = await fetch(`${baseURL}/api/users/${id}`, {
         credentials: 'include'
       });
 
@@ -66,7 +67,7 @@ const FollowPage: React.FC = () => {
     if (!user) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/api/toggle-follow/${user._id}`, {
+      const res = await fetch(`${baseURL}/api/toggle-follow/${user._id}`, {
         method: 'POST',
         credentials: 'include'
       });

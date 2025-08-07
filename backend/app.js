@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const app = express();
 const userModel = require("./model/user");
@@ -16,15 +17,21 @@ const helmet = require('helmet');
 const Post = require('./model/post'); // adjust path if needed
 
 
+// Check if FRONTEND_URL is defined
+if (!process.env.FRONTEND_URL) {
+  throw new Error('Missing FRONTEND_URL in environment variables');
+}
+
 
 // Security middleware
 app.use(helmet());
 
 // Allow requests from your frontend origin (React app on port 3000)
 app.use(cors({
-  origin: 'http://localhost:3000',
-  credentials: true
+  origin: process.env.FRONTEND_URL,
+  credentials: true,
 }));
+
 
 
 // Rate limiting

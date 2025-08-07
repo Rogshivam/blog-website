@@ -12,6 +12,7 @@ const EditPost: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
+  const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
   useEffect(() => {
     if (!id) return;
     fetchPost();
@@ -19,7 +20,7 @@ const EditPost: React.FC = () => {
 
   const fetchPost = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/posts/${id}`, {
+      const res = await fetch(`${baseURL}/api/posts/${id}`, {
         credentials: 'include'
       });
 
@@ -54,7 +55,7 @@ const EditPost: React.FC = () => {
     }
 
     try {
-      const res = await fetch(`http://localhost:5000/api/posts/${id}`, {
+      const res = await fetch(`${baseURL}/api/posts/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

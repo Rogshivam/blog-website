@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-
+const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
 const LogoutToggle: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
@@ -13,7 +13,7 @@ const LogoutToggle: React.FC = () => {
 
   const checkAuthStatus = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/profile', {
+      const res = await fetch(`${baseURL}/api/profile`, {
         credentials: 'include'
       });
       setIsLoggedIn(res.ok);
@@ -24,7 +24,7 @@ const LogoutToggle: React.FC = () => {
 
   const handleLogout = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/logout', {
+      const res = await fetch(`${baseURL}/api/logout`, {
         method: 'POST',
         credentials: 'include'
       });
