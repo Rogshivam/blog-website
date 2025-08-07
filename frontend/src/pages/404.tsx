@@ -25,7 +25,7 @@ const styles = {
     alignItems: 'center',
     textAlign: 'center' as const,
     backgroundColor: '#ddddd',
-    color: '#11111',
+    color: '#111',
     padding: '2rem',
   },
   title: {

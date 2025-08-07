@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
+import Link from 'next/link';
 import DarkModeToggle from '../components/DarkModeToggle';
+import { useAuth } from '../hooks/useAuth';
 
 const Register: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -8,29 +11,66 @@ const Register: React.FC = () => {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const router = useRouter();
+  const { register, isAuthenticated, loading: authLoading } = useAuth();
 
+  useEffect(() => {
+    if (isAuthenticated && !authLoading) {
+      router.push('/profile');
+    }
+  }, [isAuthenticated, authLoading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    try {
-      const res = await fetch('http://localhost:3001/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, email, password, name, age }),
-        credentials: 'include',
-      });
-      if (res.ok) {
-        window.location.href = '/login';
-      } else {
-        const data = await res.json();
-        setError(data.message || 'Registration failed');
-      }
-    } catch (err) {
-      setError('Registration failed');
+    setLoading(true);
+
+    // Validation
+    if (!username.trim() || !email.trim() || !password.trim() || !name.trim() || !age.trim()) {
+      setError('Please fill in all fields');
+      setLoading(false);
+      return;
     }
+
+    const ageNum = parseInt(age);
+    if (isNaN(ageNum) || ageNum < 13 || ageNum > 120) {
+      setError('Please enter a valid age (13-120)');
+      setLoading(false);
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      setLoading(false);
+      return;
+    }
+
+    const result = await register({
+      username: username.trim(),
+      email: email.trim(),
+      password,
+      name: name.trim(),
+      age: ageNum,
+    });
+
+    if (result.success) {
+      router.push('/login');
+    } else {
+      setError(result.error || 'Registration failed');
+    }
+
+    setLoading(false);
   };
+
+  if (authLoading) {
+    return <div className="loading">Loading...</div>;
+  }
+
+  if (isAuthenticated) {
+    return <div className="loading">Redirecting...</div>;
+  }
 
   return (
     <>
@@ -39,11 +79,14 @@ const Register: React.FC = () => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
       <div className="container">
-        <DarkModeToggle />
-        <h2>Register</h2>
+        <div className="header">
+          <h2>Register</h2>
+          <DarkModeToggle />
+        </div>
+        
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="username">Username:</label>
+            <label htmlFor="username">Username</label>
             <input
               type="text"
               id="username"
@@ -51,10 +94,15 @@ const Register: React.FC = () => {
               value={username}
               onChange={e => setUsername(e.target.value)}
               required
+              disabled={loading}
+              placeholder="Choose a username"
+              minLength={3}
+              maxLength={20}
             />
           </div>
+          
           <div className="form-group">
-            <label htmlFor="email">Email:</label>
+            <label htmlFor="email">Email</label>
             <input
               type="email"
               id="email"
@@ -62,10 +110,13 @@ const Register: React.FC = () => {
               value={email}
               onChange={e => setEmail(e.target.value)}
               required
+              disabled={loading}
+              placeholder="Enter your email"
             />
           </div>
+          
           <div className="form-group">
-            <label htmlFor="password">Password:</label>
+            <label htmlFor="password">Password</label>
             <input
               type="password"
               id="password"
@@ -73,10 +124,14 @@ const Register: React.FC = () => {
               value={password}
               onChange={e => setPassword(e.target.value)}
               required
+              disabled={loading}
+              placeholder="Enter your password (min 6 characters)"
+              minLength={6}
             />
           </div>
+          
           <div className="form-group">
-            <label htmlFor="name">Full Name:</label>
+            <label htmlFor="name">Full Name</label>
             <input
               type="text"
               id="name"
@@ -84,10 +139,13 @@ const Register: React.FC = () => {
               value={name}
               onChange={e => setName(e.target.value)}
               required
+              disabled={loading}
+              placeholder="Enter your full name"
             />
           </div>
+          
           <div className="form-group">
-            <label htmlFor="age">Age:</label>
+            <label htmlFor="age">Age</label>
             <input
               type="number"
               id="age"
@@ -95,15 +153,25 @@ const Register: React.FC = () => {
               value={age}
               onChange={e => setAge(e.target.value)}
               required
+              disabled={loading}
+              placeholder="Enter your age"
+              min="13"
+              max="120"
             />
           </div>
-          {error && <div style={{ color: 'red', marginBottom: 10 }}>{error}</div>}
-          <button type="submit">Register</button>
+          
+          {error && <div className="error-message">{error}</div>}
+          
+          <button type="submit" disabled={loading} className="submit-btn">
+            {loading ? 'Creating account...' : 'Register'}
+          </button>
         </form>
+        
         <div className="login-link">
-          <p>Already have an account? <a href="/login">Login here</a></p>
+          <p>Already have an account? <Link href="/login">Login here</Link></p>
         </div>
       </div>
+      
       <style jsx global>{`
         :root {
           --primary-color: #4299e1;
@@ -112,6 +180,15 @@ const Register: React.FC = () => {
           --text-color: #333;
           --container-bg: white;
           --input-border: #ddd;
+          --error-color: #e53e3e;
+          --success-color: #38a169;
+        }
+
+        .dark-mode {
+          --bg-color: #1a202c;
+          --text-color: #e2e8f0;
+          --container-bg: #2d3748;
+          --input-border: #4a5568;
         }
         
         body {
@@ -119,75 +196,144 @@ const Register: React.FC = () => {
           background-color: var(--bg-color);
           color: var(--text-color);
           margin: 0;
-          padding: 0;
+          padding: 20px;
           display: flex;
           justify-content: center;
           align-items: center;
           min-height: 100vh;
-          // transition: background-color 0.3s, color 0.3s;
+          transition: background-color 0.3s, color 0.3s;
         }
+        
         .container {
           background-color: var(--container-bg);
-          padding: 20px;
-          border-radius: 5px;
-          box-shadow: 0 0 10px rgba(0,0,0,0.1);
-          width: 300px;
+          padding: 30px;
+          border-radius: 8px;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+          width: 100%;
+          max-width: 450px;
           position: relative;
         }
-        .dark-mode-toggle {
-          position: absolute;
-          top: 10px;
-          right: 10px;
-          background: none;
-          border: none;
-          font-size: 1.5rem;
-          cursor: pointer;
-          padding: 5px;
+
+        .header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 30px;
         }
+
         h2 {
           text-align: center;
           color: var(--text-color);
-          margin-top: 30px;
+          margin: 0;
+          flex: 1;
         }
+        
         .form-group {
-          margin-bottom: 15px;
+          margin-bottom: 20px;
         }
+        
         label {
           display: block;
-          margin-bottom: 5px;
+          margin-bottom: 8px;
           color: var(--text-color);
+          font-weight: 500;
         }
+        
         input {
           width: 100%;
-          padding: 8px;
+          padding: 12px;
           border: 1px solid var(--input-border);
           border-radius: 4px;
           box-sizing: border-box;
           background-color: var(--container-bg);
           color: var(--text-color);
+          font-size: 14px;
+          transition: border-color 0.3s, box-shadow 0.3s;
         }
-        button {
+
+        input:focus {
+          outline: none;
+          border-color: var(--primary-color);
+          box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.2);
+        }
+
+        input:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+        
+        .submit-btn {
           width: 100%;
-          padding: 10px;
+          padding: 12px;
           background-color: var(--primary-color);
           color: white;
           border: none;
           border-radius: 4px;
           cursor: pointer;
+          font-size: 16px;
+          font-weight: 500;
+          transition: background-color 0.3s;
         }
-        button:hover {
+
+        .submit-btn:hover:not(:disabled) {
           background-color: var(--primary-hover);
         }
+
+        .submit-btn:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        .error-message {
+          color: var(--error-color);
+          margin-bottom: 15px;
+          padding: 10px;
+          background-color: rgba(229, 62, 62, 0.1);
+          border-radius: 4px;
+          border: 1px solid rgba(229, 62, 62, 0.3);
+          font-size: 14px;
+        }
+        
         .login-link {
           text-align: center;
-          margin-top: 15px;
+          margin-top: 20px;
+          padding-top: 20px;
+          border-top: 1px solid var(--input-border);
         }
+
+        .login-link p {
+          margin: 0;
+          color: var(--text-color);
+        }
+        
         a {
           color: var(--primary-color);
           text-decoration: none;
+          font-weight: 500;
         }
+        
         a:hover {
           text-decoration: underline;
+        }
+
+        .loading {
+          text-align: center;
+          padding: 40px;
+          font-size: 1.2rem;
+          color: var(--text-color);
+        }
+
+        @media (max-width: 480px) {
+          .container {
+            padding: 20px;
+            margin: 10px;
+          }
+          
+          .header {
+            flex-direction: column;
+            gap: 15px;
+            text-align: center;
+          }
         }
       `}</style>
     </>

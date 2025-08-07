@@ -1,30 +1,35 @@
 import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
+import Link from 'next/link';
 import DarkModeToggle from '../components/DarkModeToggle';
 import LogoutToggle from '@/components/LogoutToggle';
+import PostItem from '@/components/PostItem';
 
 interface Post {
   _id: string;
   content: string;
-  user: { _id: string; name: string };
+  user: { _id: string; name: string; username?: string };
   createdAt: string;
   likes?: string[];
 }
 
-const PublicPosts: React.FC = () => {
+  const PublicPosts: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-
+  
   const fetchPosts = (searchQuery = '') => {
     setLoading(true);
-    fetch(`http://localhost:3001/api/public-posts?search=${encodeURIComponent(searchQuery)}`, { credentials: 'include' })
+    fetch(`http://localhost:5000/api/public-posts?search=${encodeURIComponent(searchQuery)}`, {
+      credentials: 'include',
+    })
       .then(res => res.json())
       .then(data => {
-        setPosts(data.posts);
+        setPosts(Array.isArray(data.posts) ? data.posts : []);
         setLoading(false);
       })
+
       .catch(() => {
         setError('Failed to load posts');
         setLoading(false);
@@ -40,7 +45,7 @@ const PublicPosts: React.FC = () => {
     fetchPosts(search);
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div className="loader">Loading...</div>;
 
   return (
     <>
@@ -48,60 +53,44 @@ const PublicPosts: React.FC = () => {
         <title>Public Blog</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
+
       <div className="container">
-        <div className="header">
-          <div className="header-content">
-            <div className="header-top">
-              <h1>Public Blog</h1>
-              <div className="nav-buttons">
-                <a href="/profile" className="profile-btn">My Profile</a>
-                <div>
-                  <a href="/login" className="logout-btn"><LogoutToggle /></a>
-                </div>
-              </div>
+        <header className="main-header">
+          <h1>Public Blog</h1>
 
-            </div>
-            <DarkModeToggle />
-            <div className="header-bottom">
-              <form className="search-form" onSubmit={handleSearch}>
-                <input
-                  className="search-input"
-                  type="text"
-                  placeholder="Search posts or users..."
-                  value={search}
-                  onChange={e => setSearch(e.target.value)}
-                />
-                <button className="search-button" type="submit">Search</button>
-              </form>
-
+          <div className="toggles">
+          <div className="actions">
+            <Link href="/profile" className="btn">My Profile</Link>
+            <LogoutToggle />
             </div>
           </div>
-        </div>
-        <div className="posts">
-          {posts.length > 0 ? (
-            posts.map(post => (
-              <div className="post" key={post._id}>
-                <div className="post-header">
-                  <span className="post-author">{post.user.name}</span>
-                  <span className="post-date">{new Date(post.createdAt).toLocaleDateString()}</span>
-                </div>
-                <div className="post-content">{post.content}</div>
-                <div className="post-footer">
-                  <div className="post-actions">
-                    <a href={`/like/${post._id}`}>Like</a>
-                  </div>
-                  <span className="likes-count">{post.likes ? post.likes.length : 0} Likes</span>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="post">
-              <p>No posts found.</p>
+            <div className="dark-mode-toggle">
+              <DarkModeToggle />
+            
             </div>
+        </header>
+
+        <form onSubmit={handleSearch} className="search-form">
+          <input
+            type="text"
+            placeholder="Search posts or users..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
+          <button type="submit">Search</button>
+        </form>
+
+        <div className="posts">
+          {Array.isArray(posts) && posts.length > 0 ? (
+            posts.map(post => <PostItem key={post._id} post={post} />)
+          ) : (
+            <p className="no-posts">No posts found.</p>
           )}
         </div>
-        {error && <div style={{ color: 'red', marginTop: 10 }}>{error}</div>}
+
+        {error && <div className="error">{error}</div>}
       </div>
+
       <style jsx global>{`
         :root {
           --primary-color: #4299e1;
@@ -111,7 +100,20 @@ const PublicPosts: React.FC = () => {
           --container-bg: white;
           --input-border: #ddd;
           --post-bg: #f9f9f9;
+          --link-color: #007bff;
+          --link-hover: #0056b3;
         }
+        
+        .dark-mode {
+          --bg-color: #1a202c;
+          --text-color: #e2e8f0;
+          --container-bg: #2d3748;
+          --input-border: #4a5568;
+          --post-bg: #4a5568;
+          --link-color: #63b3ed;
+          --link-hover: #4299e1;
+        }
+        
         body {
           font-family: Arial, sans-serif;
           background-color: var(--bg-color);
@@ -121,124 +123,250 @@ const PublicPosts: React.FC = () => {
           transition: background-color 0.3s, color 0.3s;
         }
         
-        .header-top{
-          display: flex;
-          -webkit-box-pack: justify;
-          justify-content: space-between;
-          -webkit-box-align: center;
-          align-items: flex-end;
-        }
-        .header {
-          display: flex;
-          -webkit-box-pack: justify;
-          justify-content: space-evenly;
-          align-items: center;
-          margin-bottom: 20px;
-          align-items: stretch;
-          margin-bottom: 20px;
-          flex-direction: column;
-          flex-wrap: nowrap;
-
-        }
-        .nav-buttons {
-          display: flex;
-          gap: 10px;
-          margin-right: 2rem;
-          align-items: center;
-        }
-        .nav-buttons a {
-          padding: 8px 8px;
-          border-radius: 4px;
-          text-decoration: none;
-          align-items: center;
-          color: white;
-        }
-
-        .public-blog-btn {
-          background-color: var(--primary-color);
-        }
-        .logout-btn {
-          // font-size: 10px;
-          top: 20px;
-          background-color: #f44336;
-        }
-        .user-info {
-          margin-bottom: 20px;
-        }
-        .post-form {
-          margin-bottom: 20px;
-        }
-        textarea {
-          width: 100%;
-          padding: 10px;
-          border: 1px solid var(--input-border);
-          border-radius: 4px;
-          margin-bottom: 10px;
-          resize: vertical;
+        .container {
+          max-width: 800px;
+          margin: 0 auto;
+          padding: 20px;
           background-color: var(--container-bg);
+          border-radius: 8px;
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 15px;
+          margin-bottom: 30px;
+          padding-bottom: 20px;
+          border-bottom: 1px solid var(--input-border);
+        }
+
+        .main-header h1 {
+          margin: 0;
           color: var(--text-color);
         }
-        .posts {
-          margin-top: 20px;
+
+        .actions {
+          display: flex;
+          gap: 10px;
+          align-items: center;
+          //  margin-left: 50px;
         }
-        .post {
-          background-color: var(--post-bg);
-          padding: 15px;
-          margin-bottom: 15px;
+        .toggles{
+           padding-right: 45px;
+        }
+
+        .btn {
+          padding: 8px 16px;
+          background: var(--primary-color);
+          color: white;
+          text-decoration: none;
           border-radius: 4px;
+          transition: background-color 0.3s;
         }
+
+        .btn:hover {
+          background: var(--primary-hover);
+        }
+
+        .search-form {
+          display: flex;
+          gap: 10px;
+          margin-bottom: 30px;
+        }
+
+        .search-form input {
+          flex: 1;
+          padding: 12px;
+          border: 1px solid var(--input-border);
+          border-radius: 4px;
+          background-color: var(--container-bg);
+          color: var(--text-color);
+          font-size: 14px;
+        }
+
+        .search-form input:focus {
+          outline: none;
+          border-color: var(--primary-color);
+          box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.2);
+        }
+
+        .search-form button {
+          padding: 12px 20px;
+          background: var(--success-color);
+          color: white;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-weight: 500;
+          transition: background-color 0.3s;
+        }
+
+        .search-form button:hover {
+          background: #2f855a;
+        }
+
+        .posts {
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+        }
+
+        .post {
+          border: 1px solid var(--input-border);
+          border-radius: 8px;
+          padding: 20px;
+          background-color: var(--post-bg);
+          transition: box-shadow 0.3s;
+        }
+
+        .post:hover {
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
         .post-header {
           display: flex;
           justify-content: space-between;
-          margin-bottom: 10px;
+          align-items: center;
+          margin-bottom: 15px;
+          font-size: 14px;
         }
-        .post-actions {
-          display: flex;
-          gap: 10px;
-        }
-        .post-actions a {
-          color: var(--primary-color);
+
+        .user-link {
           text-decoration: none;
-        }
-        .post-actions a:hover {
-          text-decoration: underline;
-        }
-        .profile-stats {
-          display: flex;
-          gap: 20px;
-          margin-top: 10px;
-        }
-        .main-header {
-          justify-content: space-between;
-          display: flex;
-        }
-        .header-bottom{
-          display: flex;
-        }
-        .search-form{
-          display: flex;
-        }
-        .stat {
+          color: var(--link-color);
+          transition: color 0.3s;
           display: flex;
           flex-direction: column;
-          align-items: center;
+          gap: 2px;
         }
-        .stat-value {
-          font-size: 1.5rem;
-          font-weight: bold;
-          color: var(--primary-color);
+
+        .user-link:hover {
+          color: var(--link-hover);
         }
-        .stat-label {
-          font-size: 0.9rem;
+
+        .user-link strong {
+          font-size: 16px;
+        }
+
+        .username {
+          font-size: 12px;
+          opacity: 0.7;
+          font-weight: normal;
+        }
+
+        .post-date {
           color: var(--text-color);
-          opacity: 0.8;
+          opacity: 0.7;
+          font-size: 12px;
         }
+
+        .post-content {
+          font-size: 16px;
+          line-height: 1.6;
+          margin-bottom: 15px;
+          color: var(--text-color);
+          word-wrap: break-word;
+        }
+
+        .post-footer {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          font-size: 14px;
+        }
+
+        .like-btn {
+          padding: 8px 16px;
+          background-color: transparent;
+          border: 1px solid var(--link-color);
+          color: var(--link-color);
+          cursor: pointer;
+          border-radius: 20px;
+          transition: all 0.3s ease;
+          font-size: 14px;
+        }
+
+        .like-btn:hover {
+          background-color: var(--link-color);
+          color: white;
+        }
+
+        .like-btn.liked {
+          background-color: var(--link-color);
+          color: white;
+        }
+
+        .like-count {
+          color: var(--text-color);
+          opacity: 0.7;
+        }
+
+        .error {
+          color: #e53e3e;
+          margin-top: 20px;
+          padding: 12px;
+          background-color: rgba(229, 62, 62, 0.1);
+          border-radius: 4px;
+          border: 1px solid rgba(229, 62, 62, 0.3);
+        }
+
+        .no-posts {
+          text-align: center;
+          color: var(--text-color);
+          opacity: 0.7;
+          font-size: 16px;
+          padding: 40px;
+        }
+
+        .loader {
+          text-align: center;
+          font-size: 18px;
+          padding: 40px;
+          color: var(--text-color);
+        }
+        
         .dark-mode-toggle {
-          top: 1.09rem;
+          position: absolute;
+          top: 8px;
+    right: 7px;
+          padding-bottom: 25px;
+          z-index: 1000;
+        }
+
+        @media (max-width: 600px) {
+          .main-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+          }
+
+          .search-form {
+            flex-direction: column;
+          }
+
+          .search-form input,
+          .search-form button {
+            width: 100%;
+          }
+          
+          .post-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 5px;
+          }
+          
+          .post-footer {
+            flex-direction: column;
+            gap: 10px;
+            align-items: flex-start;
+          }
         }
       `}</style>
     </>
   );
 };
 
-export default PublicPosts; 
+export default PublicPosts;

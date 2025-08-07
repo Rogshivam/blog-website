@@ -1,10 +1,9 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-// Define the User schema
 const userSchema = new Schema(
     {
-        username: { type: String, required: true,unique: true },
+        username: { type: String, required: true, unique: true },
         email: { type: String, required: true, unique: true },
         password: { type: String, required: true },
         name: { type: String, required: true },
@@ -12,16 +11,14 @@ const userSchema = new Schema(
         posts: [
             {
                 type: mongoose.Schema.Types.ObjectId,
-                ref: "Post"  // The posts created by this user
+                ref: "Post"
             }
         ],
-        followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'user' }],
-        following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'user' }]
+        followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+        following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
     },
     { timestamps: true }
 );
 
-// Create the User model from the schema
 const User = mongoose.model('User', userSchema);
-
 module.exports = User;
