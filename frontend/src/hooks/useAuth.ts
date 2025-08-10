@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
 
 interface User {
   id: string;
@@ -13,6 +13,7 @@ interface AuthState {
   isAuthenticated: boolean;
   loading: boolean;
 }
+
 const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export const useAuth = () => {
@@ -21,12 +22,18 @@ export const useAuth = () => {
     isAuthenticated: false,
     loading: true,
   });
+
   const router = useRouter();
 
-  const checkAuth = async () => {
+  // Wait before checking auth to let backend/session warm up
+  const delayedAuthCheck = async (delayMs = 2000) => {
+    setAuthState((prev) => ({ ...prev, loading: true }));
+
+    await new Promise((resolve) => setTimeout(resolve, delayMs)); // countdown delay
+
     try {
       const res = await fetch(`${baseURL}/api/profile`, {
-        credentials: 'include',
+        credentials: "include",
       });
 
       if (res.ok) {
@@ -44,7 +51,7 @@ export const useAuth = () => {
         });
       }
     } catch (error) {
-      console.error('Auth check error:', error);
+      console.error("Auth check error:", error);
       setAuthState({
         user: null,
         isAuthenticated: false,
@@ -56,11 +63,11 @@ export const useAuth = () => {
   const login = async (email: string, password: string) => {
     try {
       const res = await fetch(`${baseURL}/api/login`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        credentials: 'include',
+        credentials: "include",
         body: JSON.stringify({ email, password }),
       });
 
@@ -77,19 +84,19 @@ export const useAuth = () => {
         return { success: false, error: errorData.message };
       }
     } catch (error) {
-      console.error('Login error:', error);
-      return { success: false, error: 'Login failed' };
+      console.error("Login error:", error);
+      return { success: false, error: "Login failed" };
     }
   };
 
   const logout = async () => {
     try {
       await fetch(`${baseURL}/api/logout`, {
-        method: 'POST',
-        credentials: 'include',
+        method: "POST",
+        credentials: "include",
       });
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error("Logout error:", error);
     } finally {
       setAuthState({
         user: null,
@@ -97,7 +104,7 @@ export const useAuth = () => {
         loading: false,
       });
       localStorage.clear();
-      router.push('/login');
+      router.push("/login");
     }
   };
 
@@ -110,11 +117,11 @@ export const useAuth = () => {
   }) => {
     try {
       const res = await fetch(`${baseURL}/api/register`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        credentials: 'include',
+        credentials: "include",
         body: JSON.stringify(userData),
       });
 
@@ -125,13 +132,13 @@ export const useAuth = () => {
         return { success: false, error: errorData.message };
       }
     } catch (error) {
-      console.error('Register error:', error);
-      return { success: false, error: 'Registration failed' };
+      console.error("Register error:", error);
+      return { success: false, error: "Registration failed" };
     }
   };
 
   useEffect(() => {
-    checkAuth();
+    delayedAuthCheck(2000); // 2-second countdown before auth check
   }, []);
 
   return {
@@ -139,6 +146,6 @@ export const useAuth = () => {
     login,
     logout,
     register,
-    checkAuth,
+    checkAuth: delayedAuthCheck,
   };
-}; 
+};
