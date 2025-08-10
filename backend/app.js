@@ -28,8 +28,10 @@ app.use(helmet());
 
 // Allow requests from your frontend origin (React app on port 3000)
 app.use(cors({
-  origin: process.env.FRONTEND_URL,
+  origin: process.env.FRONTEND_URL, // must match NEXT_PUBLIC_API_URL frontend domain
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 
@@ -349,8 +351,8 @@ app.post('/api/login', async (req, res) => {
         res.cookie('token', token, { 
             httpOnly: true, 
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-            maxAge: 10 * 60 * 1000 // 10 minutes
+            sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+            maxAge: 2 * 60 * 60 * 1000 // 2 hours
         });
         
         res.json({ 
@@ -419,7 +421,8 @@ app.post('/api/refresh-token', isLoggedIn, async (req, res) => {
         res.cookie('token', newToken, { 
             httpOnly: true, 
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
+            sameSite: 'None',
+            secure: true,
             maxAge: 10 * 60 * 1000 // 10 minutes
         });
         
