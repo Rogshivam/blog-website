@@ -65,11 +65,11 @@ const Register: React.FC = () => {
   };
 
   if (authLoading) {
-    return <div className="loading">Loading...</div>;
+    return <div className="loading"><div className="spinner"></div>Loading...</div>;
   }
 
   if (isAuthenticated) {
-    return <div className="loading">Redirecting...</div>;
+    return <div className="loading"><div className="spinner"></div>Redirecting...</div>;
   }
 
   return (
@@ -316,12 +316,7 @@ const Register: React.FC = () => {
           text-decoration: underline;
         }
 
-        .loading {
-          text-align: center;
-          padding: 40px;
-          font-size: 1.2rem;
-          color: var(--text-color);
-        }
+        
 
         @media (max-width: 480px) {
           .container {

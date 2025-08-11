@@ -46,7 +46,7 @@ interface Post {
     fetchPosts(search);
   };
 
-  if (loading) return <div className="loader">Loading...</div>;
+  if (loading) return <div className="loading"><div className="spinner"></div>Loading...</div>;
 
   return (
     <>

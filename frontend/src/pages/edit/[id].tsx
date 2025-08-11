@@ -87,7 +87,7 @@ const EditPost: React.FC = () => {
     }
   };
 
-  if (loading) return <div className="loading">Loading...</div>;
+  if (loading) return <div className="loading"><div className="spinner"></div>Loading...</div>;
 
   return (
     <>

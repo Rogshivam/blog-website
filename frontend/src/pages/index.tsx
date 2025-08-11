@@ -16,7 +16,9 @@ export default function Home() {
       height: '100vh',
       fontSize: '1.2rem'
     }}>
+      <div className="loading"><div className="spinner"></div>
       Redirecting to login...
+      </div>
     </div>
   );
 }

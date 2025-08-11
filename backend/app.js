@@ -400,10 +400,20 @@ app.post('/api/register', async (req, res) => {
     }
 });
 
+// Logout Route
 app.post('/api/logout', (req, res) => {
-    res.clearCookie('token');
-    res.json({ message: "Logout successful" });
+  const cookieOptions = {
+    httpOnly: true,
+    sameSite: 'None',  // required for cross-site cookies (frontend + backend different domains)
+    secure: process.env.NODE_ENV === 'production', // true in production, false in dev
+  };
+
+  // Clear the cookie
+  res.clearCookie('token', cookieOptions);
+
+  return res.status(200).json({ message: 'Logged out successfully' });
 });
+
 
 app.post('/api/refresh-token', isLoggedIn, async (req, res) => {
     try {

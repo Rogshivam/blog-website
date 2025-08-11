@@ -179,7 +179,7 @@ const Profile: React.FC = () => {
     }
   };
 
-  if (loading) return <div className="loading">Loading...</div>;
+  if (loading) return <div className="loading"> <div className="spinner"></div>Loading...</div>;
   if (!user) return <div className="error">User not found</div>;
 
   return (
@@ -543,12 +543,7 @@ const Profile: React.FC = () => {
           opacity: 0.8;
         }
         
-        .loading {
-          text-align: center;
-          padding: 40px;
-          font-size: 1.2rem;
-          color: var(--text-color);
-        }
+
         
         .error {
           text-align: center;
