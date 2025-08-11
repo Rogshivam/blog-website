@@ -5,9 +5,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === 'POST') {
     try {
       const { content } = req.body;
-      const BASE_URL = process.env.API_BASE_URL ;
+      const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ;
 
-      const backendRes = await fetch(`${process.env.API_BASE_URL}/api/posts`, {
+      const backendRes = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/posts`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

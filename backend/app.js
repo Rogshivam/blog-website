@@ -51,7 +51,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // CORS setup for frontend communication
 app.use(cors({
-    origin: config.CORS_ORIGIN,
+    origin: config.FRONTEND_URL,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization']
