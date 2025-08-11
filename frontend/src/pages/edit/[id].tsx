@@ -309,12 +309,7 @@ const EditPost: React.FC = () => {
           font-size: 14px;
         }
         
-        .loading {
-          text-align: center;
-          padding: 40px;
-          font-size: 1.2rem;
-          color: var(--text-color);
-        }
+        
         
         @media (max-width: 768px) {
           .container {
