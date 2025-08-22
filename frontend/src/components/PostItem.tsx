@@ -30,10 +30,16 @@ const PostItem: React.FC<Props> = ({ post }) => {
   return (
     <div className="post">
       <div className="post-header">
-        <Link href={`/follow-page/${post.user._id}`} className="user-link">
-          <strong>{post.user.name}</strong>
-          {post.user.username && <span className="username">@{post.user.username}</span>}
+        <Link
+          href={post.user ? `/follow-page/${post.user._id}` : '#'}
+          className="user-link"
+        >
+          <strong>{post.user?.name || "Unknown User"}</strong>
+          {post.user?.username && (
+            <span className="username">@{post.user.username}</span>
+          )}
         </Link>
+
         <span className="post-date">{new Date(post.createdAt).toLocaleDateString()}</span>
       </div>
       <div className="post-content">{post.content}</div>

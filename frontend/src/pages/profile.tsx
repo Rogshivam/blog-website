@@ -28,7 +28,7 @@ const Profile: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const router = useRouter();
-  const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL ;
+  const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
   useEffect(() => {
     fetchProfile();
   }, []);
@@ -65,7 +65,7 @@ const Profile: React.FC = () => {
     }
   };
 
-  // const handlePost = async (e: React.FormEvent) => {
+
   //   e.preventDefault();
   //   setError('');
 
@@ -107,6 +107,48 @@ const Profile: React.FC = () => {
   //     setError('Failed to create post');
   //   }
   // };
+  // const handlePost = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   setError('');
+
+  //   if (!content.trim()) {
+  //     setError('Post content cannot be empty');
+  //     return;
+  //   }
+
+  //   try {
+  //     const res = await fetch('/api/post', {
+  //       method: 'POST',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify({ content }),
+  //     });
+
+  //     if (res.status === 401) {
+  //       router.push('/login');
+  //       return;
+  //     }
+
+  //     if (res.ok) {
+  //       const newPost = await res.json();
+  //       setContent('');
+
+  //       // Prepend the new post to existing posts
+  //       if (user) {
+  //         const updatedUser = {
+  //           ...user,
+  //           posts: [newPost, ...user.posts],
+  //         };
+  //         setUser(updatedUser);
+  //       }
+  //     } else {
+  //       const errorData = await res.json();
+  //       setError(errorData.error || 'Failed to create post');
+  //     }
+  //   } catch (err) {
+  //     console.error('Create post error:', err);
+  //     setError('Failed to create post');
+  //   }
+  // };
   const handlePost = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -117,9 +159,10 @@ const Profile: React.FC = () => {
     }
 
     try {
-      const res = await fetch('/api/post', {
+      const res = await fetch(`${baseURL}/api/posts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // important if you use cookies/sessions
         body: JSON.stringify({ content }),
       });
 
@@ -129,16 +172,14 @@ const Profile: React.FC = () => {
       }
 
       if (res.ok) {
-        const newPost = await res.json();
         setContent('');
+        const newPost = await res.json();
 
-        // Prepend the new post to existing posts
         if (user) {
-          const updatedUser = {
+          setUser({
             ...user,
             posts: [newPost, ...user.posts],
-          };
-          setUser(updatedUser);
+          });
         }
       } else {
         const errorData = await res.json();
@@ -149,6 +190,7 @@ const Profile: React.FC = () => {
       setError('Failed to create post');
     }
   };
+
 
   const handleDeletePost = async (postId: string) => {
     if (!confirm('Are you sure you want to delete this post?')) {
@@ -199,9 +241,9 @@ const Profile: React.FC = () => {
           </div>
         </div>
 
-      <div className="dark-mode-toggle">
-        <DarkModeToggle />
-      </div>
+        <div className="dark-mode-toggle">
+          <DarkModeToggle />
+        </div>
         <div className="main-header">
           <div className="profile-stats">
             <div className="stat">
