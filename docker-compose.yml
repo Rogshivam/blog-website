@@ -1,0 +1,34 @@
+services:
+  backend:
+    image: shivamdevthakur/blogwebsite-backend:latest
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: blogwebsite-backend
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./backend/.env
+    environment:
+      - NODE_ENV=production
+    networks:
+      - blogonet
+
+  frontend:
+    image: shivamdevthakur/blogwebsite-frontend:latest
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: blogwebsite-frontend
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./frontend/.env
+    environment:
+      - NODE_ENV=production
+    networks:
+      - blogonet
+
+networks:
+  blogonet:
+    driver: bridge
