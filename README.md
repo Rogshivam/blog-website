@@ -1,174 +1,272 @@
 # Blog Website Frontend
 
-A modern React/Next.js frontend for the blog website with authentication, user profiles, and social features.
+A modern **React / Next.js (TypeScript)** frontend for a blog platform featuring authentication, user profiles, and social interactions. The project is designed with scalability, clean UI, and secure API communication in mind.
 
-## Features
+---
 
-- **Modern UI/UX**: Clean, responsive design with dark mode support
-- **Authentication**: Secure login/register with JWT token management
-- **User Profiles**: Personal profile pages with post management
-- **Social Features**: Follow/unfollow users, view user profiles
-- **Post Management**: Create, edit, delete posts with real-time updates
-- **Search**: Search posts and users across the platform
-- **Dark Mode**: Toggle between light and dark themes
-- **Mobile Responsive**: Optimized for all device sizes
+## ✨ Features
 
-## Tech Stack
+* **Modern UI/UX** – Clean, responsive interface with dark mode support
+* **Authentication** – Secure login & registration using JWT (HTTP-only cookies)
+* **User Profiles** – Personal profiles with post management
+* **Social Features** – Follow / unfollow users and view public profiles
+* **Post Management** – Create, edit, and delete posts with instant UI updates
+* **Search** – Search posts and users across the platform
+* **Dark Mode** – Persistent light/dark theme toggle
+* **Mobile Responsive** – Optimized for all screen sizes
 
-- **Framework**: Next.js with TypeScript
-- **Styling**: CSS-in-JS with styled-jsx
-- **State Management**: React hooks and context
-- **Authentication**: Custom auth hook with JWT
-- **Routing**: Next.js routing with dynamic routes
-- **API**: RESTful API integration with backend
+---
 
-## Setup Instructions
+## 🛠 Tech Stack
 
-1. **Install Dependencies**:
-   ```bash
-   npm install
-   ```
+* **Framework**: Next.js (Pages Router) with TypeScript
+* **Styling**: CSS-in-JS (styled-jsx) + global CSS
+* **State Management**: React Hooks & Context API
+* **Authentication**: Custom auth hook with JWT (handled via backend cookies)
+* **Routing**: Next.js dynamic routing
+* **API Integration**: RESTful backend APIs
 
-2. **Environment Configuration**:
-   Create a `.env.local` file in the frontend directory:
-   ```
-   NEXT_PUBLIC_API_URL=http://localhost:5000
-   ```
+---
 
-3. **Start the Development Server**:
-   ```bash
-   npm run dev
-   ```
-   The application will be running at http://localhost:3000
+## 🚀 Setup Instructions
 
-4. **Build for Production**:
-   ```bash
-   npm run build
-   npm start
-   ```
+### Option 1: Using Docker (Recommended)
 
-## Project Structure
+Run containers:
 
-```
-frontend/
-├── src/
-│   ├── components/          # Reusable React components
-│   │   ├── DarkModeToggle.tsx
-│   │   ├── LogoutToggle.tsx
-|   |   ├──LoadingScreen.jsx
-│   │   └── PostItem.tsx
-│   ├── hooks/              # Custom React hooks
-│   │   ├── useAuth.ts      # Authentication hook
-|   |   ├── LogoutToggle.ts  #Logout hook
-│   │   └── useDarkMode.ts  # Dark mode hook
-│   ├── pages/              # Next.js pages
-│   │   ├── api/           # API routes
-│   │   ├── login.tsx      # Login page
-│   │   ├── register.tsx   # Registration page
-│   │   ├── 404.tsx
-│   │   ├── profile.tsx    # User profile page
-│   │   ├── public-posts.tsx # Public posts feed
-│   │   ├── follow-page.tsx  # User profile view
-│   │   └── edit.tsx       # Post edit page
-│   └── styles/            # Global styles
-│       └── globals.css
-├── public/                # Static assets
-└── package.json
+```bash
+docker compose up -d
 ```
 
-## Key Components
+Check running containers:
 
-### Authentication Hook (`useAuth.ts`)
-- Manages user authentication state
-- Handles login, logout, and registration
-- Token management and refresh
-- Automatic redirects for authenticated users
+```bash
+docker ps
+```
 
-### Dark Mode Toggle
-- Persistent theme preference
-- Smooth transitions between themes
-- CSS custom properties for theming
+Expected ports:
+
+```text
+Frontend (Next.js):  http://localhost:3000
+Backend API:        http://localhost:4000
+```
+
+Stop containers:
+
+```bash
+docker compose down
+```
+
+---
+
+### Option 2: Manual Setup
+
+#### 1. Install dependencies
+
+```bash
+npm install
+```
+
+#### 2. Environment configuration
+
+Create a `.env.local` file in the frontend root:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:4000
+```
+
+#### 3. Start development server
+
+```bash
+npm run dev
+```
+
+Application runs at:
+
+```text
+http://localhost:3000
+```
+
+#### 4. Build for production
+
+```bash
+npm run build
+npm start
+```
+
+---
+
+## 📁 Project Structure
+
+
+```text
+blog-website
+├──backend/
+|  ├── src/
+|  │   ├── model/              # Database models
+|  │   │   ├── user.js
+|  │   │   ├── post.js
+|  │   │   └── follow.js
+|  │   ├── config.js              # App & DB configuration
+|  │   ├── app.js               # Express app setup
+|  ├── .env
+|  ├── Dockerfile
+|  ├── package.json
+|  ├── package-lock.json
+|  frontend/
+|  ├── src/
+|  │   ├── components/          # Reusable UI components
+|  │   │   ├── DarkModeToggle.tsx
+|  │   │   ├── LogoutToggle.tsx
+|  │   │   ├── LoadingScreen.tsx
+|  │   │   └── PostItem.tsx
+|  │   ├── hooks/               # Custom React hooks
+|  │   │   ├── useAuth.ts       # Authentication logic
+|  │   │   ├── useLogout.ts     # Logout handler
+|  │   │   └── useDarkMode.ts   # Dark mode hook
+|  │   ├── pages/               # Next.js Pages Router
+|  │   │   ├── api/             # Optional Next.js API helpers
+|  │   │   ├── login.tsx
+|  │   │   ├── register.tsx
+|  │   │   ├── profile.tsx
+|  │   │   ├── public-posts.tsx
+|  │   │   ├── follow-page.tsx
+|  │   │   ├── edit.tsx
+|  │   │   └── 404.tsx
+|  │   │   └──_app.tsx
+|  │   │   └──_document.tsx
+|  │   └── styles/
+|  │       └── globals.css
+|  ├── public/                  # Static assets
+|  ├── package.json
+|  ├── dockerfile
+│   ├── next.config.ts
+│   ├── tsconfig.json
+│   ├── package.json
+│   └── package-lock.json
+│
+├── docker-compose.yml
+├── .dockerignore
+├── .gitignore
+└── README.md
+```
+
+---
+
+## 🔑 Key Components
+
+### Authentication (`useAuth.ts`)
+
+* Maintains authentication state
+* Handles login, registration, and logout
+* Relies on backend-managed HTTP-only cookies
+* Protects private routes via auth checks
+
+### Dark Mode
+
+* System preference detection
+* Persistent theme storage
+* Smooth theme transitions
 
 ### Post Management
-- Create new posts with character limits
-- Edit existing posts with validation
-- Delete posts with confirmation
-- Real-time updates
+
+* Create, edit, and delete posts
+* Input validation & confirmation dialogs
+* Instant UI refresh after actions
 
 ### User Profiles
-- Personal profile with stats
-- Follow/unfollow functionality
-- User post history
-- Responsive design
 
-## API Integration
+* Profile details with statistics
+* Follow / unfollow users
+* Public post history
+* Fully responsive layout
 
-The frontend communicates with the backend through RESTful APIs:
+---
 
-- **Authentication**: `/api/login`, `/api/register`, `/api/logout`
-- **User Management**: `/api/profile`, `/api/users/:id`
-- **Posts**: `/api/posts`, `/api/public-posts`
-- **Social**: `/api/toggle-follow/:id`
+## 🔌 API Integration
 
-All API calls include proper error handling and loading states.
+The frontend communicates with the backend using RESTful APIs:
 
-## Security Features
+* **Auth**: `/api/login`, `/api/register`, `/api/logout`
+* **Users**: `/api/profile`, `/api/users/:id`
+* **Posts**: `/api/posts`, `/api/public-posts`
+* **Social**: `/api/toggle-follow/:id`
 
-- JWT token management with automatic refresh
-- HTTP-only cookies for secure token storage
-- Input validation and sanitization
-- Protected routes with authentication checks
-- CORS handling for cross-origin requests
+All requests include:
 
-## Styling
+* Centralized error handling
+* Loading states
+* Secure cookie-based authentication
 
-- CSS custom properties for theming
-- Responsive design with mobile-first approach
-- Smooth transitions and animations
-- Consistent design system
-- Dark mode support
+---
 
-## Development
+## 🔐 Security
+
+* JWT stored in **HTTP-only cookies** (backend controlled)
+* No sensitive tokens stored in localStorage
+* Protected routes with auth guards
+* Input validation & sanitization
+* Proper CORS handling
+
+---
+
+## 🎨 Styling
+
+* CSS custom properties for theming
+* Mobile-first responsive design
+* Consistent spacing & typography
+* Dark mode support
+* Smooth UI transitions
+
+---
+
+## 🧪 Development
 
 ### Available Scripts
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm start` - Start production server
-- `npm run lint` - Run ESLint
+* `npm run dev` – Start development server
+* `npm run build` – Production build
+* `npm start` – Start production server
+* `npm run lint` – Run ESLint
 
 ### Code Quality
 
-- TypeScript for type safety
-- ESLint for code linting
-- Prettier for code formatting
-- Component-based architecture
+* TypeScript for strong typing
+* ESLint for linting
+* Prettier for formatting
+* Component-based architecture
 
-## Deployment
+---
 
-The frontend can be deployed to various platforms:
+## 🚢 Deployment Options
 
-- **Vercel**: Optimized for Next.js
-- **Netlify**: Static site hosting
-- **AWS Amplify**: Full-stack hosting
-- **Docker**: Containerized deployment
+* **Vercel** (Recommended for Next.js)
+* **Netlify**
+* **AWS Amplify**
+* **Docker-based hosting**
 
-## Browser Support
+---
 
-- Chrome (latest)
-- Firefox (latest)
-- Safari (latest)
-- Edge (latest)
-- Mobile browsers
+## 🌍 Browser Support
 
-## Contributing
+* Chrome (latest)
+* Firefox (latest)
+* Safari (latest)
+* Edge (latest)
+* Mobile browsers
+
+---
+
+## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch
-3. Make your changes
+3. Commit your changes
 4. Add tests if applicable
-5. Submit a pull request
+5. Open a pull request
 
-## License
+---
 
-This project is licensed under the MIT License.
+## 📄 License
+
+This project is licensed under the **MIT License**.
